@@ -28,7 +28,6 @@ int main(void) {
                 << " and " << RNG_higher_bound << ": ";
     do {
         cin >> myGuess;
-        
     } while (myGuess != answer);
     cout << "Correct! " << answer << " is the right answer.\n" << endl;
     
