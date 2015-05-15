@@ -3,6 +3,8 @@
 #include <time.h>       /* time */
 
 #define num_elements 10
+#define RNG_lower_bound 1
+#define RNG_higher_bound 10
 
 using namespace std;
 
@@ -21,8 +23,9 @@ int main(void) {
     delete []array1;
     cout << endl;
     
-    cout << "Part 4:" << endl << "Make a guess between 1 and 10: ";
     answer = RNG();
+    cout << "Part 4:" << endl << "Make a guess between " << RNG_lower_bound
+                << " and " << RNG_higher_bound << ": ";
     do {
         cin >> myGuess;
         
@@ -49,5 +52,5 @@ void fill_array(int first, int inc){
 
 int RNG() {
     srand(time(0));
-    return (1 + rand()%10); //format is (stating_number + rand()%range_of_number)
+    return (RNG_lower_bound + rand()%(RNG_higher_bound - RNG_lower_bound +1));
 }
