@@ -92,7 +92,7 @@ bool CDate::isValidDay(int year, int month, int day)
 		case 10:
 		case 12:
 			// you need to fill in the code here
-			(day<=31) ? valid=true : valid=false;
+			valid = true;
 			break;
 		case 2:
 			if ( ((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0) {
