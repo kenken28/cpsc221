@@ -1,5 +1,18 @@
-// File hashDriver.cpp:
-// Place your identifying information here CLEARLY.
+ /* File hashDriver.cpp:
+  *
+  * by passing a numerical argument when running the exacutable,
+  * i.e.:    ./hashDriver [numberOfEntries]
+  * the prcess will run the genData exacutable to generate a key list file named 
+  * 'internal.txt' with specified number of entries. Then this file will be
+  * processd using the test cases given in the assignment description.
+  * 
+  * if no argument was passed when executing, it will run a series 
+  * of default test cases, including the ones specified in the 
+  * assignment description, on a default file named 'example.txt'(10000 keys).
+  * 
+  * run makefile first to compile both genData.cpp and hashDriver.cpp, so that genData
+  * could be used internally in hashDriver.
+  */
 
 #include <iostream>
 #include <string.h>

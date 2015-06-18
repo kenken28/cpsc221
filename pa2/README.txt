@@ -2,7 +2,8 @@ Yuxin Xu    37909090    m4j7
 Rico Wen    32458119    w7c8
 
 
-Note1: by passing a numerical argument when running the exacutable,
+Note1: (same as the comments at the top of hashDriver.cpp)
+       by passing a numerical argument when running the exacutable,
        i.e.:    ./hashDriver [numberOfEntries]
        the prcess will run the genData exacutable to generate a key list file named 
        'internal.txt' with specified number of entries. Then this file will be
