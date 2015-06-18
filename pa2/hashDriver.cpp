@@ -23,7 +23,7 @@ public:
 };
 
 
-#define TABLE_SIZE 2000 // Change as necessary
+#define TABLE_SIZE 10000 // Change as necessary
 class Hasher {
 private:
     TableEntry** table;
@@ -37,43 +37,49 @@ private:
     
     // Define any other necessary helper functions that are not part of the public interface:
     
-	// PRE: the input parameter key needs to have exactly 8 characters
-	// POST: generates a hash tag
+    // PRE: the input parameter key needs to be type string
+    // POST: generates a hash tag
     // this is the poor hash function
     int poorHash(std::string key) {
         int hash = 0;
-        for (int i=0; i<8; ++i) {
+        int keyLen = key.length();
+        for (int i=0; i<keyLen; ++i) {
             hash += key[i];
         }
         return hash % TABLE_SIZE;
     }
     
-	// PRE: the input parameter key needs to have exactly 8 characters
-	// POST: generates a hash tag
+    // PRE: the input parameter key needs to be type string
+    // POST: generates a hash tag
     // this is the good hash function, it will be used in double hashing
     int goodHash(std::string key) {
         unsigned long hash = 0;
-        for (int i=0; i<8; ++i) {
+        int keyLen = key.length();
+        for (int i=0; i<keyLen; ++i) {
             hash = hash * 131 + key[i];
         }
         return hash % TABLE_SIZE;
     }
     
-	// PRE: the input parameter key needs to have exactly 8 characters
-	// POST: generates a hash tag
+    // PRE: the input parameter key needs to be type string
+    // POST: generates a hash tag
     // this is another hash function which will be used in double hashing
     int goodHash2(std::string key) {
         unsigned long hash = 0;
-        for (int i=0; i<8; ++i) {
+        int keyLen = key.length();
+        for (int i=0; i<keyLen; ++i) {
             hash = (hash * 278 + key[i]) % TABLE_SIZE;
         }
         return hash;
     }
     
-	// PRE: specified hash table is created, mode has to be either :
-	//		'i', 's' or 'r'.
-	// POST: if the target index is found, it will be stored in the
-	//		 parameter 'index'
+    /*
+
+    */
+    // PRE: specified hash table is created, mode has to be either :
+    //      'i', 's' or 'r'.
+    // POST: if the target index is found, it will be stored in the
+    //      parameter 'index'
     /* this function does the probing step, it operates in 3 modes:
      * insert(i), search(s), remove(r). by passing it different parameters,
      * it will run on different mode.
@@ -131,8 +137,8 @@ private:
 public:
     // Define the necessary constructors (be sure to initialize your table entries to NULL):
     
-	// PRE: all input parameters are valid
-	// POST: create a Hasher type object and initialize variables
+    // PRE: all input parameters are valid
+    // POST: create a Hasher type object and initialize variables
     /* this function constructs an empty hash table and
      * initializes every variables
      */
@@ -161,9 +167,9 @@ public:
             std::cout << "Input ERROR: Invalid probe type." << std::endl;
     }
     
-	// PRE: all input parameters are valid. note: filename must be casted
-	//		into (char*), e.g. Hasher('g', 'q', 0.25, (char*)"test.txt");
-	// POST: create a Hasher type object with specified data file inerted
+    // PRE: all input parameters are valid. note: filename must be casted
+    //      into (char*), e.g. Hasher('g', 'q', 0.25, (char*)"test.txt");
+    // POST: create a Hasher type object with specified data file inerted
     /* this function constructs a hash table, initializes every variables,
      * and then insert entries read from [filename] into the table
      * the load of the table will be determined by the Load Factor(lf)
@@ -211,8 +217,8 @@ public:
     
     // Define the following functions:
     
-	// PRE: specified hash table is constructed
-	// POST: subscribe the index of the key if it exists
+    // PRE: specified hash table is constructed
+    // POST: subscribe the index of the key if it exists
     /* this function search for specified key, returns
      * true if key is found, returns false otherwise
      */ 
@@ -228,8 +234,8 @@ public:
         return true;
     }
     
-	// PRE: specified hash table is constructed
-	// POST: insert key if there is a space available
+    // PRE: specified hash table is constructed
+    // POST: insert key if there is a space available
     /* this function insert a specified key and value, it 
      * returns true if key is inserted, returns false otherwise
      */ 
@@ -250,8 +256,8 @@ public:
         return true;
     }
     
-	// PRE: specified hash table is constructed
-	// POST: delete key if it exists, else do nothing
+    // PRE: specified hash table is constructed
+    // POST: delete key if it exists, else do nothing
     /* this function search for specified key and remove that entry,
      * it returns true if key is removed, returns false otherwise
      */ 
@@ -290,34 +296,30 @@ public:
             std::cout << std::endl;
         }
     }
-	
-	// PRE:	Hash table is constructed using :
-	// 		Hasher(char type, char crp, float lf, char* filename)
-	// POST: N/A (Preconditions hold)
-	void printTrial() {
+
+    // PRE:	Hash table is constructed using :
+    // 		Hasher(char type, char crp, float lf, char* filename)
+    // POST: N/A (Preconditions hold)
+    void printTrial() {
         /* after printing out the table, some relevent parametes of the table
          * will be printed as well, note: if Load Factor is not specified, 
          * it will be equal to -1 
          */
-		if (isGoodHash == true)
-			std::cout << "[HashFunction: Good] ";
-		else
-			std::cout << "[HashFunction: Poor] ";
-		
+        if (isGoodHash == true)
+            std::cout << "[HashFunction: Good] ";
+        else
+            std::cout << "[HashFunction: Poor] ";
+        
         std::cout << "[LoadFactor: " << loadFactor
-					<< "] [HashTableSize: " << TABLE_SIZE
+                    << "] [HashTableSize: " << TABLE_SIZE
                     << "] [RowsInserted: " << numInserts 
-                    << "] [ProbesPerInsert: " 
-					<< (float)numProbes/(float)numInserts;
-			
-		if (isQuadProbe == true)
-			std::cout << "] [ExpectedProbes: " 
-						<< (1/loadFactor)*log(1/(1-loadFactor));
-			
-		std::cout << "]" 
-                    << std::endl
-                    << "====================================================================="
-                    << std::endl;
+                    << "] [ProbesPerInsert: " << (float)numProbes/(float)numInserts;
+        
+        if (isQuadProbe == true)
+            std::cout << "] [ExpectedProbes: " 
+                        << (1/loadFactor)*log(1/(1-loadFactor));
+            
+        std::cout << "]" << std::endl;
     }
     
     // Define any other necessary functions that are part of the public interface:
@@ -341,58 +343,11 @@ public:
 int main( int argc, char* argv[])
 {
     int subscript = -1;
-	
-	//tests for result table 1
-	Hasher* goodHashQ025 = new Hasher('g', 'q', 0.25, (char*)"test.txt");
-    Hasher* goodHashQ050 = new Hasher('g', 'q', 0.50, (char*)"test.txt");
-    Hasher* goodHashQ075 = new Hasher('g', 'q', 0.75, (char*)"test.txt");	
-    Hasher* poorHashQ025 = new Hasher('b', 'q', 0.25, (char*)"test.txt");
-    Hasher* poorHashQ050 = new Hasher('b', 'q', 0.50, (char*)"test.txt");
-    Hasher* poorHashQ075 = new Hasher('b', 'q', 0.75, (char*)"test.txt");
-	
-	goodHashQ025->printTrial();
-	goodHashQ050->printTrial();
-	goodHashQ075->printTrial();
-	poorHashQ025->printTrial();
-	poorHashQ050->printTrial();
-	poorHashQ075->printTrial();
-	
-	//tests for result table 2
-	Hasher* goodHashD025 = new Hasher('g', 'd', 0.25, (char*)"test.txt");
-    Hasher* goodHashD050 = new Hasher('g', 'd', 0.50, (char*)"test.txt");
-    Hasher* goodHashD075 = new Hasher('g', 'd', 0.75, (char*)"test.txt");	
-    Hasher* poorHashD025 = new Hasher('b', 'd', 0.25, (char*)"test.txt");
-    Hasher* poorHashD050 = new Hasher('b', 'd', 0.50, (char*)"test.txt");
-    Hasher* poorHashD075 = new Hasher('b', 'd', 0.75, (char*)"test.txt");
-	
-	goodHashD025->printTrial();
-	goodHashD050->printTrial();
-	goodHashD075->printTrial();
-	poorHashD025->printTrial();
-	poorHashD050->printTrial();
-	poorHashD075->printTrial();
-	
+    
     /*
-    // Generate empty hash tables:
+    // Generate empty hash tables and test different functions using this table
     Hasher* goodHashRP1 = new Hasher('g', 'd');
-    Hasher* goodHashQP1 = new Hasher('g', 'q');
-    Hasher* badHashRP1 = new Hasher('b', 'd');
-    Hasher* badHashQP1 = new Hasher('b', 'q');
     
-    // Generate hash tables that are systematically loaded from file.
-    // Note that if you cannot fit an element you should stop inserting elements
-    // and set a flag to full.
-    Hasher* goodHashRP2 = new Hasher('g', 'd', 0.25, (char*)"test.txt");
-    Hasher* goodHashQP2 = new Hasher('g', 'q', 0.5, (char*)"test.txt");
-    Hasher* poorHashRP2 = new Hasher('b', 'd', 0.75, (char*)"test.txt");
-    Hasher* poorHashQP2 = new Hasher('b', 'q', 0.25, (char*)"test.txt");
-    
-    goodHashRP2->printTable();
-    goodHashQP2->printTable();
-    poorHashRP2->printTable();
-    poorHashQP2->printTable();
-    
-    //testing table goodHashRP1
     // insert ABCDEFGH
     if(goodHashRP1->insert("ABCDEFGH",213)) 
         std::cout << "Inserted" << std::endl;
@@ -447,6 +402,12 @@ int main( int argc, char* argv[])
     else
         std::cout << "Failed to insert" << std::endl;
     
+    // insert RAMDOMWD again
+    if(goodHashRP1->insert("RAMDOMWD",168)) 
+        std::cout << "Inserted" << std::endl;
+    else
+        std::cout << "Failed to insert" << std::endl;
+    
     // remove ZZZBBZZZ which doesn't exist
     if(goodHashRP1->remove("ZZZBBZZZ")) 
         std::cout << "Removed" << std::endl;
@@ -456,6 +417,36 @@ int main( int argc, char* argv[])
     goodHashRP1->printTable();
     */
     
+    
+    //tests for result table 1
+    Hasher* goodHashQ025 = new Hasher('g', 'q', 0.25, (char*)"test.txt");
+    Hasher* goodHashQ050 = new Hasher('g', 'q', 0.50, (char*)"test.txt");
+    Hasher* goodHashQ075 = new Hasher('g', 'q', 0.75, (char*)"test.txt");	
+    Hasher* poorHashQ025 = new Hasher('b', 'q', 0.25, (char*)"test.txt");
+    Hasher* poorHashQ050 = new Hasher('b', 'q', 0.50, (char*)"test.txt");
+    Hasher* poorHashQ075 = new Hasher('b', 'q', 0.75, (char*)"test.txt");
+    
+    goodHashQ025->printTrial();
+    goodHashQ050->printTrial();
+    goodHashQ075->printTrial();
+    poorHashQ025->printTrial();
+    poorHashQ050->printTrial();
+    poorHashQ075->printTrial();
+    
+    //tests for result table 2
+    Hasher* goodHashD025 = new Hasher('g', 'd', 0.25, (char*)"test.txt");
+    Hasher* goodHashD050 = new Hasher('g', 'd', 0.50, (char*)"test.txt");
+    Hasher* goodHashD075 = new Hasher('g', 'd', 0.75, (char*)"test.txt");	
+    Hasher* poorHashD025 = new Hasher('b', 'd', 0.25, (char*)"test.txt");
+    Hasher* poorHashD050 = new Hasher('b', 'd', 0.50, (char*)"test.txt");
+    Hasher* poorHashD075 = new Hasher('b', 'd', 0.75, (char*)"test.txt");
+    
+    goodHashD025->printTrial();
+    goodHashD050->printTrial();
+    goodHashD075->printTrial();
+    poorHashD025->printTrial();
+    poorHashD050->printTrial();
+    poorHashD075->printTrial();
     
     return 0;
 }
