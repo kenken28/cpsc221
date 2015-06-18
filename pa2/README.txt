@@ -1,11 +1,24 @@
 Yuxin Xu    37909090    m4j7
 Rico Wen    32458119    w7c8
 
-Note1: 
+
+Note1: by passing a numerical argument when running the exacutable,
+       i.e.:    ./hashDriver [numberOfEntries]
+       the prcess will run the genData exacutable to generate a key list file named 
+       'internal.txt' with specified number of entries. Then this file will be
+       processd using the test cases given in the assignment description.
+       
+       if no argument was passed when executing, it will run a series 
+       of default test cases, including the ones specified in the 
+       assignment description, on a default file named 'example.txt'(10000 keys).
+       
+       run makefile first to compile both genData.cpp and hashDriver.cpp, so that genData
+       could be used internally in hashDriver.
 
 Note2: To use the constructor 'Hasher(char type, char crp, float lf, char* filename)',
        the input parameter 'filename' needs to be casted into (char*).
        e.g.:     Hasher('g', 'q', 0.25, (char*)"test.txt");
+
 
 1. For the poor hash function we used the method provided in the assignment description. 
    For the 2 good has functions we searched on Google for "hash function for string", 

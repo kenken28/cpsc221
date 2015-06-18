@@ -2,9 +2,12 @@
 // Place your identifying information here CLEARLY.
 
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <fstream>
 #include <math.h>
+#include <cstdlib>
+#include <unistd.h>
+#include <sys/wait.h>
 
 
 class TableEntry {
@@ -212,6 +215,8 @@ public:
                 insert(key,value);
             }
             dataFile.close();
+        } else {
+            std::cout << "ERROR opening file: ." << filename << std::endl;
         }
     }
     
@@ -297,8 +302,8 @@ public:
         }
     }
 
-    // PRE:	Hash table is constructed using :
-    // 		Hasher(char type, char crp, float lf, char* filename)
+    // PRE: Hash table is constructed using :
+    //          Hasher(char type, char crp, float lf, char* filename)
     // POST: N/A (Preconditions hold)
     void printTrial() {
         /* after printing out the table, some relevent parametes of the table
@@ -337,94 +342,30 @@ public:
 
 
 
-// **Sample** main function/driver-- THIS IS NOT A COMPLETE TEST SUITE
-// YOU MUST WRITE YOUR OWN TESTS
-// See assignment description.
-int main( int argc, char* argv[])
-{
-    int subscript = -1;
-    
-    /*
-    // Generate empty hash tables and test different functions using this table
-    Hasher* goodHashRP1 = new Hasher('g', 'd');
-    
-    // insert ABCDEFGH
-    if(goodHashRP1->insert("ABCDEFGH",213)) 
-        std::cout << "Inserted" << std::endl;
-    else
-        std::cout << "Failed to insert" << std::endl;
-    
-    // insert AAAAAAAA
-    if(goodHashRP1->insert("AAAAAAAA",32)) 
-        std::cout << "Inserted" << std::endl;
-    else
-        std::cout << "Failed to insert" << std::endl;
-    
-    // insert HELLOMAN
-    if(goodHashRP1->insert("HELLOMAN",181)) 
-        std::cout << "Inserted" << std::endl;
-    else
-        std::cout << "Failed to insert" << std::endl;
-    
-    // seach for HELLOMAN
-    if(goodHashRP1->search("HELLOMAN",subscript)) 
-        std::cout << "Found at " << subscript << std::endl;
-    else
-        std::cout << "Failed to find" << std::endl;
-    
-    // remove AAAAAAAA
-    if(goodHashRP1->remove("AAAAAAAA")) 
-        std::cout << "Removed" << std::endl;
-    else
-        std::cout << "Not deleted/not found" << std::endl;
-    
-    // remove HELLOMAN
-    if(goodHashRP1->remove("HELLOMAN")) 
-        std::cout << "Removed" << std::endl;
-    else
-        std::cout << "Not deleted/not found" << std::endl;
-    
-    // insert HELLOMAN again with a different value
-    if(goodHashRP1->insert("HELLOMAN",45)) 
-        std::cout << "Inserted" << std::endl;
-    else
-        std::cout << "Failed to insert" << std::endl;
-    
-    // seach for ABCDEFGH
-    if(goodHashRP1->search("ABCDEFGH",subscript)) 
-        std::cout << "Found at " << subscript << std::endl;
-    else
-        std::cout << "Failed to find" << std::endl;
-    
-    // insert RAMDOMWD
-    if(goodHashRP1->insert("RAMDOMWD",93)) 
-        std::cout << "Inserted" << std::endl;
-    else
-        std::cout << "Failed to insert" << std::endl;
-    
-    // insert RAMDOMWD again
-    if(goodHashRP1->insert("RAMDOMWD",168)) 
-        std::cout << "Inserted" << std::endl;
-    else
-        std::cout << "Failed to insert" << std::endl;
-    
-    // remove ZZZBBZZZ which doesn't exist
-    if(goodHashRP1->remove("ZZZBBZZZ")) 
-        std::cout << "Removed" << std::endl;
-    else
-        std::cout << "Not deleted/not found" << std::endl;
-    //print this table
-    goodHashRP1->printTable();
-    */
-    
-    
+
+/* this function finds current filepath
+ * it is for locating and executing genData
+ */
+std::string getexepath () {
+    char result[100];
+    ssize_t count = readlink("/proc/self/exe", result, 100);
+    return std::string( result, (count > 0) ? count : 0 );
+}
+
+// PRE: the 'filename' file is in correct key list format
+/* this function is a series of test cases given in the assignment.
+ * To use testCase bundle, pass the filename of the data Key list
+ * e.g.   testCases((char*)"example.txt");
+ */
+void testCasesBundle (char* filename) {
     //tests for result table 1
-    Hasher* goodHashQ025 = new Hasher('g', 'q', 0.25, (char*)"test.txt");
-    Hasher* goodHashQ050 = new Hasher('g', 'q', 0.50, (char*)"test.txt");
-    Hasher* goodHashQ075 = new Hasher('g', 'q', 0.75, (char*)"test.txt");	
-    Hasher* poorHashQ025 = new Hasher('b', 'q', 0.25, (char*)"test.txt");
-    Hasher* poorHashQ050 = new Hasher('b', 'q', 0.50, (char*)"test.txt");
-    Hasher* poorHashQ075 = new Hasher('b', 'q', 0.75, (char*)"test.txt");
+    std::cout << "========== Quadratic Probing ==========" << std::endl;
+    Hasher* goodHashQ025 = new Hasher('g', 'q', 0.25, filename);
+    Hasher* goodHashQ050 = new Hasher('g', 'q', 0.50, filename);
+    Hasher* goodHashQ075 = new Hasher('g', 'q', 0.75, filename);
+    Hasher* poorHashQ025 = new Hasher('b', 'q', 0.25, filename);
+    Hasher* poorHashQ050 = new Hasher('b', 'q', 0.50, filename);
+    Hasher* poorHashQ075 = new Hasher('b', 'q', 0.75, filename);
     
     goodHashQ025->printTrial();
     goodHashQ050->printTrial();
@@ -434,12 +375,13 @@ int main( int argc, char* argv[])
     poorHashQ075->printTrial();
     
     //tests for result table 2
-    Hasher* goodHashD025 = new Hasher('g', 'd', 0.25, (char*)"test.txt");
-    Hasher* goodHashD050 = new Hasher('g', 'd', 0.50, (char*)"test.txt");
-    Hasher* goodHashD075 = new Hasher('g', 'd', 0.75, (char*)"test.txt");	
-    Hasher* poorHashD025 = new Hasher('b', 'd', 0.25, (char*)"test.txt");
-    Hasher* poorHashD050 = new Hasher('b', 'd', 0.50, (char*)"test.txt");
-    Hasher* poorHashD075 = new Hasher('b', 'd', 0.75, (char*)"test.txt");
+    std::cout << "========= Double Hash Probing =========" << std::endl;
+    Hasher* goodHashD025 = new Hasher('g', 'd', 0.25, filename);
+    Hasher* goodHashD050 = new Hasher('g', 'd', 0.50, filename);
+    Hasher* goodHashD075 = new Hasher('g', 'd', 0.75, filename);
+    Hasher* poorHashD025 = new Hasher('b', 'd', 0.25, filename);
+    Hasher* poorHashD050 = new Hasher('b', 'd', 0.50, filename);
+    Hasher* poorHashD075 = new Hasher('b', 'd', 0.75, filename);
     
     goodHashD025->printTrial();
     goodHashD050->printTrial();
@@ -447,6 +389,110 @@ int main( int argc, char* argv[])
     poorHashD025->printTrial();
     poorHashD050->printTrial();
     poorHashD075->printTrial();
+}
+
+// test case function for insert
+void testInsert (Hasher* hasher, std::string key, int val) {
+    if(hasher->insert(key,val)) 
+        std::cout << key << " Inserted" << std::endl;
+    else
+        std::cout << "Failed to insert" << std::endl;
+}
+// test case function for seach
+void testSearch (Hasher* hasher, std::string key, int& index) {
+    if(hasher->search(key,index)) 
+        std::cout << key << " Found at " << index << std::endl;
+    else
+        std::cout << "Failed to find" << std::endl;
+}
+
+// test case function for remove
+void testRemove (Hasher* hasher, std::string key) {
+    if(hasher->remove(key)) 
+        std::cout << key << " Removed" << std::endl;
+    else
+        std::cout << key << " Not deleted/not found" << std::endl;
+}
+
+
+
+
+// **Sample** main function/driver-- THIS IS NOT A COMPLETE TEST SUITE
+// YOU MUST WRITE YOUR OWN TESTS
+// See assignment description.
+int main( int argc, char* argv[])
+{
+    int subscript = -1;
+    const char* charPath;
+    std::string path;
+    pid_t pid;
+    
+    /* by passing a numerical argument when running the exacutable,
+     * the prcess will run the genData exacutable to generate a key
+     * list file named 'internal.txt' with specified number of entries
+     * in it.
+     * Then this file will be processed using 'testCasesBundle(filename)'
+     * 
+     * if no argument was pass when executing, it will run a series 
+     * of default test cases, including the ones specified in the 
+     * assignment description.
+     */
+    if (argc > 1) {
+        path.assign(getexepath());
+        path.erase(path.length()-10, 10);
+        path.append("genData");
+        charPath = path.c_str();
+        
+        pid = fork(); /* Create a child process */
+        switch (pid) {
+            case -1: /* Error */
+                std::cout << "ERROR: fork() failed." << std::endl;
+                exit(1);
+            case 0: /* Child process */
+                execl(charPath, charPath, argv[1], "internal.txt", NULL); /* Execute the program */
+                std::cout << "ERROR: execl() failed!" << std::endl; /* execl doesn't return unless there's an error */
+                exit(1);
+            default: /* Parent process */
+                //std::cout << "Process created with pid " << pid << std::endl;
+                std::cout << "Generated Key list 'internal.txt' with " 
+                            << atoi(argv[1]) << " entries. Start processing..."<< std::endl 
+                            << "===========================================================" 
+                            << std::endl;
+        }
+        
+        testCasesBundle((char*)"internal.txt");
+        return 0;
+    } else {
+        
+        // Generate empty hash tables and test different functions using this table
+        Hasher* goodHashRP1 = new Hasher('g', 'd');
+        
+        // insert ABCDEFGH
+        testInsert(goodHashRP1,"ABCDEFGH",11);
+        // insert AAAAAAAA
+        testInsert(goodHashRP1,"AAAAAAAA",22);
+        // seach for AAAAAAAA
+        testSearch(goodHashRP1,"AAAAAAAA",subscript);
+        // remove AAAAAAAA
+        testRemove(goodHashRP1,"AAAAAAAA");
+        // seach for ABCDEFGH
+        testSearch(goodHashRP1,"ABCDEFGH",subscript);
+        // insert RAMDOMWD
+        testInsert(goodHashRP1,"RAMDOMWD",55);
+        // update RAMDOMWD with a new value
+        testInsert(goodHashRP1,"RAMDOMWD",66);
+        // remove ZZZBBZZZ which doesn't exist
+        testRemove(goodHashRP1,"ZZZZZZZZ");
+        
+        // print this table
+        /* in order to see the full talble after running hashDriver, 
+         * make the TABLE_SIZE smaller, e.g. 20
+         */ 
+        goodHashRP1->printTable();
+        
+        // Process default file.
+        testCasesBundle((char*)"example.txt");
+    }
     
     return 0;
 }
