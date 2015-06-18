@@ -20,6 +20,9 @@ Note2: To use the constructor 'Hasher(char type, char crp, float lf, char* filen
        e.g.:     Hasher('g', 'q', 0.25, (char*)"test.txt");
 
 
+
+Assignment Questions:
+
 1. For the poor hash function we used the method provided in the assignment description. 
    For the 2 good has functions we searched on Google for "hash function for string", 
    then we tested some of the decent looking results (Fowler–Noll–Vo hash function was 
@@ -38,20 +41,20 @@ Note2: To use the constructor 'Hasher(char type, char crp, float lf, char* filen
    load factor (i.e. 0.25), it is 10 times as efficient as the Knuth estimates. 
 
 
-Table 1, Quadratic Probing
+================= Table 1, Quadratic Probing ==================
 [HashFunction]  [LoadFactor]    [HashTableSize] [RowsInserted]  [ProbesPerInsert]   [ExpectedProbes]
-Good            0.25            10000           2500            0.1264              1.15073
-Good            0.5             10000           5000            0.4044              1.38629
-Good            0.75            10000           7500            0.910933            1.84839
-Poor            0.25            10000           2500            32.8244             1.15073
-Poor            0.5             10000           5000            51.1108             1.38629
-Poor            0.75            10000           7500            76.9445             1.84839
+ Good            0.25            10000           2500            0.126400            1.15073
+ Good            0.5             10000           5000            0.404400            1.38629
+ Good            0.75            10000           7500            0.910933            1.84839
+ Poor            0.25            10000           2500            32.824402           1.15073
+ Poor            0.5             10000           5000            51.110802           1.38629
+ Poor            0.75            10000           7500            76.944534           1.84839
 
-Table 2, Double Hash Probing
+================= Table 2, Double Hash Probing ==================
 [HashFunction]  [LoadFactor]    [HashTableSize] [RowsInserted]  [ProbesPerInsert]
-Good            0.25            10000           2500            0.124
-Good            0.5             10000           5000            0.3792
-Good            0.75            10000           7500            0.831467
-Poor            0.25            10000           2500            1.134
-Poor            0.5             10000           5000            1.4302
-Poor            0.75            10000           7500            1.88987
+ Good            0.25            10000           2500            0.124000
+ Good            0.5             10000           5000            0.379200
+ Good            0.75            10000           7500            0.831467
+ Poor            0.25            10000           2500            1.134000
+ Poor            0.5             10000           5000            1.430200
+ Poor            0.75            10000           7500            1.889867

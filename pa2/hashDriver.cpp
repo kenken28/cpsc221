@@ -7,7 +7,6 @@
 #include <math.h>
 #include <cstdlib>
 #include <unistd.h>
-#include <sys/wait.h>
 
 
 class TableEntry {
@@ -90,7 +89,7 @@ private:
      * it returns the number of probs and the hashed index number for different mode
      */
     int probeEntry(std::string key, int& index, char mode) {
-        int hashKey, hashKey2, newHashKey, probe = 0;
+        unsigned long hashKey, hashKey2, newHashKey, probe = 0;
         bool isFound = false;
         std::string tempKey;
         
@@ -311,24 +310,48 @@ public:
          * it will be equal to -1 
          */
         if (isGoodHash == true)
-            std::cout << "[HashFunction: Good] ";
+            std::cout << "[Good Hash]  ";
         else
-            std::cout << "[HashFunction: Poor] ";
+            std::cout << "[Poor Hash]  ";
         
-        std::cout << "[LoadFactor: " << loadFactor
-                    << "] [HashTableSize: " << TABLE_SIZE
-                    << "] [RowsInserted: " << numInserts 
-                    << "] [ProbesPerInsert: " << (float)numProbes/(float)numInserts;
+        std::cout << std::fixed << loadFactor << "      " 
+                    << TABLE_SIZE << "             " 
+                    << numInserts << "           " 
+                    << (float)numProbes/(float)numInserts <<  "         ";
         
         if (isQuadProbe == true)
-            std::cout << "] [ExpectedProbes: " 
-                        << (1/loadFactor)*log(1/(1-loadFactor));
+            std::cout << std::fixed << (1/loadFactor)*log(1/(1-loadFactor));
             
-        std::cout << "]" << std::endl;
+        std::cout << std::endl;
     }
     
     // Define any other necessary functions that are part of the public interface:
+    /** Returns the key stored at given subscript. */
+    const std::string getKey(const int subscript) {
+        return table[subscript]->getKey();
+    }
     
+    /** Returns the data value at given subscript. */
+    const int getValue(const int subscript) {
+        return table[subscript]->getValue();
+    }
+    
+    /** Returns the number of probes. */
+    const int getProbes(void) {
+        return numProbes;
+    }
+    
+    /** Returns the hashTableSize. */
+    const int getCapacity(void) {
+        return TABLE_SIZE;
+    }
+    
+    /** Returns the number of non-empty elements. */
+    const int getSize(void) {
+        return numEntires;
+    }
+    
+
     // Destructor-- do not alter.
     ~Hasher() 
     {
@@ -359,7 +382,8 @@ std::string getexepath () {
  */
 void testCasesBundle (char* filename) {
     //tests for result table 1
-    std::cout << "========== Quadratic Probing ==========" << std::endl;
+    std::cout << std::endl << "========== Quadratic Probing HashKey file [" 
+                << filename << "] ==========" << std::endl;
     Hasher* goodHashQ025 = new Hasher('g', 'q', 0.25, filename);
     Hasher* goodHashQ050 = new Hasher('g', 'q', 0.50, filename);
     Hasher* goodHashQ075 = new Hasher('g', 'q', 0.75, filename);
@@ -367,6 +391,7 @@ void testCasesBundle (char* filename) {
     Hasher* poorHashQ050 = new Hasher('b', 'q', 0.50, filename);
     Hasher* poorHashQ075 = new Hasher('b', 'q', 0.75, filename);
     
+    std::cout << "            [LoadFactor] [HashTableSize] [RowsInserted] [ProbesPerInsert] [ExpectedProbes]" << std::endl;
     goodHashQ025->printTrial();
     goodHashQ050->printTrial();
     goodHashQ075->printTrial();
@@ -375,7 +400,8 @@ void testCasesBundle (char* filename) {
     poorHashQ075->printTrial();
     
     //tests for result table 2
-    std::cout << "========= Double Hash Probing =========" << std::endl;
+    std::cout << std::endl << "========= Double Hash Probing HashKey file [" 
+                << filename << "] =========" << std::endl;
     Hasher* goodHashD025 = new Hasher('g', 'd', 0.25, filename);
     Hasher* goodHashD050 = new Hasher('g', 'd', 0.50, filename);
     Hasher* goodHashD075 = new Hasher('g', 'd', 0.75, filename);
@@ -383,6 +409,7 @@ void testCasesBundle (char* filename) {
     Hasher* poorHashD050 = new Hasher('b', 'd', 0.50, filename);
     Hasher* poorHashD075 = new Hasher('b', 'd', 0.75, filename);
     
+    std::cout << "            [LoadFactor] [HashTableSize] [RowsInserted] [ProbesPerInsert]" << std::endl;
     goodHashD025->printTrial();
     goodHashD050->printTrial();
     goodHashD075->printTrial();
@@ -396,14 +423,14 @@ void testInsert (Hasher* hasher, std::string key, int val) {
     if(hasher->insert(key,val)) 
         std::cout << key << " Inserted" << std::endl;
     else
-        std::cout << "Failed to insert" << std::endl;
+        std::cout << "Failed to insert " << key << std::endl;
 }
 // test case function for seach
 void testSearch (Hasher* hasher, std::string key, int& index) {
     if(hasher->search(key,index)) 
         std::cout << key << " Found at " << index << std::endl;
     else
-        std::cout << "Failed to find" << std::endl;
+        std::cout << "Failed to find " << key << std::endl;
 }
 
 // test case function for remove
@@ -411,7 +438,7 @@ void testRemove (Hasher* hasher, std::string key) {
     if(hasher->remove(key)) 
         std::cout << key << " Removed" << std::endl;
     else
-        std::cout << key << " Not deleted/not found" << std::endl;
+        std::cout << "Cannot delete/cannot find " << key << std::endl;
 }
 
 
@@ -427,71 +454,72 @@ int main( int argc, char* argv[])
     std::string path;
     pid_t pid;
     
-    /* by passing a numerical argument when running the exacutable,
-     * the prcess will run the genData exacutable to generate a key
-     * list file named 'internal.txt' with specified number of entries
-     * in it.
-     * Then this file will be processed using 'testCasesBundle(filename)'
+    /* if a numeric argument is passed to the exacutable, a new key list 
+     * file 'internal.txt' will be generated and will be processed.
      * 
-     * if no argument was pass when executing, it will run a series 
-     * of default test cases, including the ones specified in the 
-     * assignment description.
+     * else run tests on default file 'example.txt'
      */
     if (argc > 1) {
+        // first get the file path of genData
         path.assign(getexepath());
         path.erase(path.length()-10, 10);
         path.append("genData");
         charPath = path.c_str();
         
-        pid = fork(); /* Create a child process */
+        pid = fork(); // create a child process to run genData
         switch (pid) {
-            case -1: /* Error */
+            case -1: // failed to fork
                 std::cout << "ERROR: fork() failed." << std::endl;
                 exit(1);
-            case 0: /* Child process */
+            case 0: // in child process, run genData
                 execl(charPath, charPath, argv[1], "internal.txt", NULL); /* Execute the program */
                 std::cout << "ERROR: execl() failed!" << std::endl; /* execl doesn't return unless there's an error */
                 exit(1);
-            default: /* Parent process */
-                //std::cout << "Process created with pid " << pid << std::endl;
-                std::cout << "Generated Key list 'internal.txt' with " 
-                            << atoi(argv[1]) << " entries. Start processing..."<< std::endl 
-                            << "===========================================================" 
-                            << std::endl;
+            default: // in parent process, run test cases bundle on the generated file
+                usleep( 10000 ); // wait for some time so the file is fully generated
+                std::cout<< std::endl << "Generated Key list 'internal.txt' with " 
+                            << atoi(argv[1]) << " entries. Start processing..." << std::endl;
+                testCasesBundle((char*)"internal.txt");
         }
-        
-        testCasesBundle((char*)"internal.txt");
-        return 0;
-    } else {
-        
-        // Generate empty hash tables and test different functions using this table
+    } else { 
+        std::cout << std::endl << "=================== Test Individual Functions ===================" << std::endl;
+        // construct an empty hash tables and test different functions using this table
         Hasher* goodHashRP1 = new Hasher('g', 'd');
         
-        // insert ABCDEFGH
-        testInsert(goodHashRP1,"ABCDEFGH",11);
-        // insert AAAAAAAA
-        testInsert(goodHashRP1,"AAAAAAAA",22);
-        // seach for AAAAAAAA
-        testSearch(goodHashRP1,"AAAAAAAA",subscript);
-        // remove AAAAAAAA
-        testRemove(goodHashRP1,"AAAAAAAA");
-        // seach for ABCDEFGH
-        testSearch(goodHashRP1,"ABCDEFGH",subscript);
-        // insert RAMDOMWD
-        testInsert(goodHashRP1,"RAMDOMWD",55);
-        // update RAMDOMWD with a new value
-        testInsert(goodHashRP1,"RAMDOMWD",66);
-        // remove ZZZBBZZZ which doesn't exist
-        testRemove(goodHashRP1,"ZZZZZZZZ");
+        testInsert(goodHashRP1,"ABCDEFGH",11); // insert ABCDEFGH
         
-        // print this table
+        testInsert(goodHashRP1,"AAAAAAAA",22); // insert AAAAAAAA
+        
+        testSearch(goodHashRP1,"AAAAAAAA",subscript); // seach for AAAAAAAA
+        
+        testRemove(goodHashRP1,"AAAAAAAA"); // remove AAAAAAAA
+        
+        testSearch(goodHashRP1,"AAAAAAAA",subscript); // seach for AAAAAAAA
+        
+        testInsert(goodHashRP1,"RAMDOMWD",33); // insert RAMDOMWD
+        
+        testSearch(goodHashRP1,"RAMDOMWD",subscript); // seach for RAMDOMWD
+        std::cout << goodHashRP1->getKey(subscript) << " now has value: " 
+                    << goodHashRP1->getValue(subscript) <<std::endl;
+        
+        testInsert(goodHashRP1,"RAMDOMWD",44);// update RAMDOMWD with a new value
+        
+        testSearch(goodHashRP1,"RAMDOMWD",subscript);// seach for the new RAMDOMWD
+        std::cout << goodHashRP1->getKey(subscript) << " now has value: " 
+                    << goodHashRP1->getValue(subscript) <<std::endl;
+        
+        testRemove(goodHashRP1,"ZZZZZZZZ");// remove ZZZBBZZZ which doesn't exist
+        
+        testSearch(goodHashRP1,"ABCDEFGH",subscript);// seach for ABCDEFGH
+        
+        
         /* in order to see the full talble after running hashDriver, 
          * make the TABLE_SIZE smaller, e.g. 20
          */ 
-        goodHashRP1->printTable();
+        //goodHashRP1->printTable(); // print this table
         
-        // Process default file.
-        testCasesBundle((char*)"example.txt");
+        
+        testCasesBundle((char*)"example.txt"); // Process default file.
     }
     
     return 0;
